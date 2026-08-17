@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BrainFeed - Create Question</title>
+    <link rel="icon" type="image/x-icon" href="/asset/imgages/download.png">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="/asset/script/script.js"></script>
+    <style>
+        :root {
+            --bg-dark: #0a111e;
+            --bg-glow: #1a2a44;
+            --accent: #4285f4;
+            --accent-glow: #5ec0f8;
+            --glass: rgba(255, 255, 255, 0.06);
+            --border: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+            --text-dim: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            height: 100dvh;
+            display: flex;
+            justify-content: center;
+            overflow: hidden;
+            background: radial-gradient(circle at center, var(--bg-glow) 0%, var(--bg-dark) 100%);
+            color: var(--text-main);
+        }
+
+        /* ----- APP SHELL STRUCTURE ----- */
+        .app-shell {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* ----- TOP NAVIGATION ----- */
+        .top-nav {
+            padding: clamp(15px, 4dvh, 30px) 20px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .nav-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .nav-icon {
+            color: #fff;
+            width: 22px;
+            cursor: pointer;
+        }
+
+        /* ----- CREATE SCROLL AREA ----- */
+        .create-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 20px 120px;
+            scrollbar-width: none;
+        }
+
+        .create-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        /* ----- CREATOR CARD ----- */
+        .creator-card {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .creator-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .mini-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--accent);
+        }
+
+        .creator-text h4 {
+            font-size: 0.95rem;
+            color: white;
+        }
+
+        .creator-text p {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        .contributor-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(214, 158, 46, 0.1);
+            color: #d69e2e;
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        /* ----- FORM INPUTS ----- */
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        label {
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .glass-input {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 15px;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .glass-input:focus {
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        textarea.glass-input {
+            min-height: 120px;
+            resize: none;
+            line-height: 1.5;
+        }
+
+        /* SELECTOR CHIPS */
+        .selector-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .chip-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .select-chip {
+            padding: 10px 18px;
+            border-radius: 50px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            color: #fff;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .select-chip.active {
+            border-color: var(--accent);
+            background: rgba(66, 133, 244, 0.1);
+            color: var(--accent-glow);
+        }
+
+        /* OPTIONS */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .option-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            border-radius: 50px;
+        }
+
+        .opt-label {
+            width: 32px;
+            height: 32px;
+            background: var(--accent);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.8rem;
+        }
+
+        .option-row input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #fff;
+            flex: 1;
+            font-size: 1rem;
+        }
+
+        .correct-toggle {
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .correct-toggle.active {
+            color: #4ade80;
+        }
+
+        /* ----- SIDEBAR / BOTTOM NAV ----- */
+        .side-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 10px 25px;
+            background: rgba(10, 17, 30, 0.95);
+            backdrop-filter: blur(15px);
+            border-top: 1px solid var(--border);
+            z-index: 100;
+        }
+
+        .nav-tab {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            color: var(--text-dim);
+            text-decoration: none;
+            flex: 1;
+        }
+
+        .nav-tab.active {
+            color: var(--accent);
+        }
+
+        .nav-text-mobile {
+            font-size: 0.65rem;
+        }
+
+        .nav-text-desktop {
+            display: none;
+        }
+
+        /* ----- FOOTER ----- */
+        .create-footer {
+            padding: 20px 20px 110px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .primary-btn {
+            width: 100%;
+            padding: 18px;
+            border-radius: 20px;
+            border: none;
+            background: linear-gradient(90deg, var(--accent), var(--accent-glow));
+            color: #fff;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(66, 133, 244, 0.3);
+        }
+
+        .ai-prompt {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(66, 133, 244, 0.05);
+            border-radius: 18px;
+            border: 1px dashed rgba(66, 133, 244, 0.3);
+        }
+
+        .ai-icon-box {
+            width: 40px;
+            height: 40px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+        }
+
+        /* ----- RESPONSIVE: COMPUTER VIEW (> 1024px) ----- */
+        @media (min-width: 1024px) {
+            .app-shell {
+                display: grid;
+                grid-template-columns: 260px 1fr;
+                grid-template-areas: "sidebar main";
+            }
+
+            .side-nav {
+                grid-area: sidebar;
+                position: static;
+                flex-direction: column;
+                height: 100vh;
+                padding: 40px 20px;
+                border-top: none;
+                border-right: 1px solid var(--border);
+                justify-content: flex-start;
+                gap: 12px;
+                background: transparent;
+            }
+
+            .nav-tab {
+                flex-direction: row;
+                padding: 15px 20px;
+                border-radius: 16px;
+                gap: 15px;
+                flex: none;
+                width: 100%;
+            }
+
+            .nav-tab:hover {
+                background: var(--glass);
+            }
+
+            .nav-tab.active {
+                background: rgba(66, 133, 244, 0.1);
+            }
+
+            .nav-text-mobile {
+                display: none;
+            }
+
+            .nav-text-desktop {
+                display: block;
+                font-size: 1rem;
+            }
+
+            .main-content {
+                grid-area: main;
+            }
+
+            .top-nav {
+                padding: 30px 40px;
+            }
+
+            .create-scroll {
+                padding: 0 40px 40px;
+                height: calc(100vh - 120px);
+            }
+
+            .form-container {
+                grid-template-columns: 1.5fr 1fr;
+                align-items: start;
+                gap: 30px;
+            }
+
+            .options-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .create-footer {
+                padding: 30px 0;
+            }
+        }
+
+        /* ----- MOBILE FIXES (< 480px) ----- */
+        @media (max-width: 480px) {
+            html {
+                font-size: 13px;
+            }
+
+            .selector-row {
+                grid-template-columns: 1fr;
+            }
+
+            .create-scroll {
+                padding-bottom: 120px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-shell">
+        <nav class="side-nav">
+            <a href="./MainFeedPG.html" class="nav-tab">
+                <i data-lucide="home"></i>
+                <span class="nav-text-mobile">Home</span>
+                <span class="nav-text-desktop">Home Feed</span>
+            </a>
+            <a href="./PostPG.html" class="nav-tab active">
+                <i data-lucide="square-plus"></i>
+                <span class="nav-text-mobile">Post</span>
+                <span class="nav-text-desktop">New Post</span>
+            </a>
+            <a href="./AnalticsPG.html" class="nav-tab">
+                <i data-lucide="bar-chart-3"></i>
+                <span class="nav-text-mobile">Analytics</span>
+                <span class="nav-text-desktop">Analytics</span>
+            </a>
+            <a href="./notificationPG.html" class="nav-tab">
+                <i data-lucide="bell"></i>
+                <span class="nav-text-mobile">Alerts</span>
+                <span class="nav-text-desktop">Notifications</span>
+            </a>
+            <a href="./ProfilePG.html" class="nav-tab">
+                <i data-lucide="user"></i>
+                <span class="nav-text-mobile">Profile</span>
+                <span class="nav-text-desktop">Profile</span>
+            </a>
+        </nav>
+
+        <div class="main-content">
+            <header class="top-nav">
+                <i data-lucide="arrow-left" class="nav-icon" onclick="history.back()"></i>
+                <h1 class="nav-title">New Question</h1>
+                <i data-lucide="check-check" class="nav-icon" style="color: #4ade80"></i>
+            </header>
+
+            <main class="create-scroll">
+                <div class="form-container">
+
+                    <div class="form-left-column" style="display: flex; flex-direction: column; gap: 20px;">
+                        <section class="creator-card">
+                            <div class="creator-info">
+                                <div class="mini-avatar" id="creator-avatar"
+                                    style="display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem;background:#1e293b;color:#fff;">
+                                    ?</div>
+                                <div class="creator-text">
+                                    <h4 id="creator-name">Loading...</h4>
+                                    <p>Student Contributor</p>
+                                </div>
+                            </div>
+                            <div class="contributor-badge">
+                                <i data-lucide="sparkles" width="14"></i>
+                                <span>Creator</span>
+                            </div>
+                        </section>
+
+                        <div class="input-section">
+                            <label>The Question</label>
+                            <textarea class="glass-input" placeholder="What is your logical challenge?"></textarea>
+                            <div style="text-align: right; font-size: 0.7rem; color: var(--text-dim);">0 / 500</div>
+                        </div>
+
+                        <div class="input-section">
+                            <label>Answer Options</label>
+                            <div class="options-grid">
+                                <div class="option-row">
+                                    <span class="opt-label">A</span>
+                                    <input type="text" placeholder="Option A">
+                                    <i data-lucide="check-circle" class="correct-toggle"></i>
+                                </div>
+                                <div class="option-row">
+                                    <span class="opt-label">B</span>
+                                    <input type="text" placeholder="Option B">
+                                    <i data-lucide="check-circle" class="correct-toggle"></i>
+                                </div>
+                                <div class="option-row">
+                                    <span class="opt-label">C</span>
+                                    <input type="text" placeholder="Option C">
+                                    <i data-lucide="check-circle" class="correct-toggle"></i>
+                                </div>
+                                <div class="option-row">
+                                    <span class="opt-label">D</span>
+                                    <input type="text" placeholder="Option D">
+                                    <i data-lucide="check-circle" class="correct-toggle"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-right-column" style="display: flex; flex-direction: column; gap: 20px;">
+                        <div class="input-section">
+                            <label>Subject Category</label>
+                            <div class="chip-group">
+                                <div class="select-chip active">Aptitude</div>
+                                <div class="select-chip">Maths</div>
+                                <div class="select-chip">Reasoning</div>
+                                <div class="select-chip">Coding</div>
+                            </div>
+                        </div>
+
+                        <div class="input-section">
+                            <label>Set Difficulty</label>
+                            <div class="chip-group">
+                                <div class="select-chip">Easy</div>
+                                <div class="select-chip active">Medium</div>
+                                <div class="select-chip">Hard</div>
+                            </div>
+                        </div>
+
+                        <div class="input-section">
+                            <label>Tags (#topics)</label>
+                            <input type="text" class="glass-input" placeholder="e.g. #Probability #GATE">
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="create-footer">
+                    <button class="primary-btn">Publish to Feed</button>
+
+                    <div class="ai-prompt">
+                        <div class="ai-icon-box"><i data-lucide="wand-2" width="20"></i></div>
+                        <div>
+                            <p style="font-size: 0.85rem; font-weight: 700;">BrainFeed AI Assistant</p>
+                            <p style="font-size: 0.75rem; color: var(--text-dim);">I can help you polish the question or
+                                generate options.</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Populate creator card with logged-in user
+        (function () {
+            const user = BrainFeedAPI.getUser();
+            if (user) {
+                const initials = (user.name || 'U').split(' ').map(n => n[0]).join('').toUpperCase();
+                document.getElementById('creator-name').textContent = user.name;
+                document.getElementById('creator-avatar').textContent = initials;
+            } else {
+                document.getElementById('creator-name').textContent = 'Guest';
+                document.getElementById('creator-avatar').textContent = 'G';
+            }
+        })();
+
+        // Toggle Chips
+        document.querySelectorAll('.select-chip').forEach(chip => {
+            chip.addEventListener('click', function () {
+                const parent = this.parentElement;
+                parent.querySelectorAll('.select-chip').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Correct Answer Selector
+        document.querySelectorAll('.correct-toggle').forEach(toggle => {
+            toggle.addEventListener('click', function () {
+                document.querySelectorAll('.correct-toggle').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+
+</html>

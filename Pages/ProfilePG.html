@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BrainFeed - Profile</title>
+    <link rel="icon" type="image/x-icon" href="/asset/imgages/download.png">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="/asset/script/script.js"></script>
+    <style>
+        :root {
+            --bg-dark: #0a111e;
+            --bg-glow: #1a2a44;
+            --accent: #4285f4;
+            --accent-glow: #5ec0f8;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+            --text-dim: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            min-height: 100dvh;
+            display: flex;
+            justify-content: center;
+            overflow-x: hidden;
+            background: radial-gradient(circle at center, var(--bg-glow) 0%, var(--bg-dark) 100%);
+            color: var(--text-main);
+        }
+
+        .app-shell {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-nav {
+            padding: 20px 20px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-icon {
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .nav-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .profile-header {
+            text-align: center;
+            padding: 30px 20px 20px;
+        }
+
+        .avatar-ring {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            background: #1e293b;
+            font-size: 2.5rem;
+            font-weight: 800;
+        }
+
+        .profile-name {
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .profile-sub {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            padding: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-val {
+            font-size: 1.3rem;
+            font-weight: 800;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        .profile-section {
+            padding: 0 20px;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+            margin-bottom: 12px;
+        }
+
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 18px;
+            margin-bottom: 12px;
+        }
+
+        .badge-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .badge {
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid var(--border);
+        }
+
+        .badge.earned {
+            border-color: var(--accent);
+            background: rgba(66, 133, 244, 0.15);
+            color: var(--accent-glow);
+        }
+
+        .badge.locked {
+            opacity: 0.4;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+
+        .info-value {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 16px;
+            border: 1px solid rgba(248, 113, 113, 0.3);
+            background: rgba(248, 113, 113, 0.1);
+            color: #f87171;
+            font-weight: 700;
+            cursor: pointer;
+            margin: 20px 0 100px;
+            transition: 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(248, 113, 113, 0.2);
+        }
+
+        .loading-text {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-dim);
+        }
+
+        @media (max-width: 480px) {
+            .stats-row {
+                gap: 20px;
+            }
+
+            .stat-val {
+                font-size: 1.1rem;
+            }
+        }
+
+        /* SIDEBAR / BOTTOM NAV */
+        .side-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 10px 25px;
+            background: rgba(10, 17, 30, 0.95);
+            backdrop-filter: blur(15px);
+            border-top: 1px solid var(--border);
+            z-index: 100;
+        }
+
+        .nav-tab {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            color: var(--text-dim);
+            text-decoration: none;
+            flex: 1;
+        }
+
+        .nav-tab.active {
+            color: var(--accent);
+        }
+
+        .nav-text-mobile {
+            font-size: 0.65rem;
+        }
+
+        .nav-text-desktop {
+            display: none;
+        }
+
+        @media (min-width: 1024px) {
+            body {
+                overflow: hidden;
+            }
+
+            .app-shell {
+                max-width: none;
+                display: grid;
+                grid-template-columns: 260px 1fr;
+                grid-template-areas: "sidebar main";
+            }
+
+            .side-nav {
+                grid-area: sidebar;
+                position: static;
+                flex-direction: column;
+                height: 100vh;
+                padding: 40px 20px;
+                border-top: none;
+                border-right: 1px solid var(--border);
+                justify-content: flex-start;
+                gap: 12px;
+                background: transparent;
+            }
+
+            .nav-tab {
+                flex-direction: row;
+                padding: 15px 20px;
+                border-radius: 16px;
+                gap: 15px;
+                flex: none;
+                width: 100%;
+            }
+
+            .nav-tab:hover {
+                background: var(--glass);
+            }
+
+            .nav-tab.active {
+                background: rgba(66, 133, 244, 0.1);
+            }
+
+            .nav-text-mobile {
+                display: none;
+            }
+
+            .nav-text-desktop {
+                display: block;
+                font-size: 1rem;
+            }
+
+            .main-content {
+                grid-area: main;
+                overflow-y: auto;
+                max-height: 100vh;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-shell">
+        <nav class="side-nav">
+            <a href="./MainFeedPG.html" class="nav-tab">
+                <i data-lucide="home"></i>
+                <span class="nav-text-mobile">Home</span>
+                <span class="nav-text-desktop">Home Feed</span>
+            </a>
+            <a href="./PostPG.html" class="nav-tab">
+                <i data-lucide="square-plus"></i>
+                <span class="nav-text-mobile">Post</span>
+                <span class="nav-text-desktop">New Post</span>
+            </a>
+            <a href="./AnalticsPG.html" class="nav-tab">
+                <i data-lucide="bar-chart-3"></i>
+                <span class="nav-text-mobile">Analytics</span>
+                <span class="nav-text-desktop">Analytics</span>
+            </a>
+            <a href="./notificationPG.html" class="nav-tab">
+                <i data-lucide="bell"></i>
+                <span class="nav-text-mobile">Alerts</span>
+                <span class="nav-text-desktop">Notifications</span>
+            </a>
+            <a href="./ProfilePG.html" class="nav-tab active">
+                <i data-lucide="user"></i>
+                <span class="nav-text-mobile">Profile</span>
+                <span class="nav-text-desktop">Profile</span>
+            </a>
+        </nav>
+
+        <div class="main-content">
+            <header class="top-nav">
+                <div class="nav-left">
+                    <i data-lucide="arrow-left" class="nav-icon" onclick="history.back()"></i>
+                    <h1 class="nav-title">Profile</h1>
+                </div>
+                <i data-lucide="settings" class="nav-icon" style="width:20px"></i>
+            </header>
+
+            <div id="profile-content">
+                <div class="loading-text">Loading profile...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        async function loadProfile() {
+            const container = document.getElementById('profile-content');
+            const user = BrainFeedAPI.getUser();
+
+            if (!user) {
+                container.innerHTML = `<div class="loading-text"><p>Please log in to view your profile.</p><br><a href="LoginPG.html" style="color:var(--accent); font-weight:600;">Go to Login</a></div>`;
+                return;
+            }
+
+            const initials = (user.name || 'U').split(' ').map(n => n[0]).join('').toUpperCase();
+
+            let analyticsData = {};
+            try {
+                analyticsData = await BrainFeedAPI.fetchAnalytics();
+            } catch (e) {
+                console.warn('Could not load analytics for profile:', e);
+            }
+
+            const eng = analyticsData.engagement || {};
+            const profile = analyticsData.learningProfile || {};
+            const features = analyticsData.features || {};
+
+            // Badges logic
+            const badges = [];
+            if (eng.totalAttempts >= 1) badges.push({ name: 'First Step', earned: true, icon: '🎯' });
+            else badges.push({ name: 'First Step', earned: false, icon: '🎯' });
+
+            if (eng.streak >= 3) badges.push({ name: '3-Day Streak', earned: true, icon: '🔥' });
+            else badges.push({ name: '3-Day Streak', earned: false, icon: '🔥' });
+
+            if (eng.totalAttempts >= 50) badges.push({ name: '50 Solved', earned: true, icon: '⚡' });
+            else badges.push({ name: '50 Solved', earned: false, icon: '⚡' });
+
+            if (eng.overallAccuracy >= 80) badges.push({ name: 'Sharp Mind', earned: true, icon: '🧠' });
+            else badges.push({ name: 'Sharp Mind', earned: false, icon: '🧠' });
+
+            if (eng.totalAttempts >= 100) badges.push({ name: '100 Club', earned: true, icon: '💎' });
+            else badges.push({ name: '100 Club', earned: false, icon: '💎' });
+
+            container.innerHTML = `
+                <div class="profile-header">
+                    <div class="avatar-ring">${initials}</div>
+                    <div class="profile-name">${user.name}</div>
+                    <div class="profile-sub">${profile.type || 'New Learner'} • ${user.department || 'Student'}</div>
+                </div>
+
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <span class="stat-val">${eng.streak || 0}</span>
+                        <span class="stat-label">Day Streak</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-val">${eng.totalAttempts || 0}</span>
+                        <span class="stat-label">Solved</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-val">${eng.overallAccuracy || 0}%</span>
+                        <span class="stat-label">Accuracy</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-val">${eng.totalSessions || 0}</span>
+                        <span class="stat-label">Sessions</span>
+                    </div>
+                </div>
+
+                <div class="profile-section">
+                    <div class="section-title">Badges</div>
+                    <div class="badge-grid">
+                        ${badges.map(b => `<span class="badge ${b.earned ? 'earned' : 'locked'}">${b.icon} ${b.name}</span>`).join('')}
+                    </div>
+                </div>
+
+                <div class="profile-section">
+                    <div class="section-title">Account Details</div>
+                    <div class="glass-card">
+                        <div class="info-row"><span class="info-label">Email</span><span class="info-value">${user.email}</span></div>
+                        <div class="info-row"><span class="info-label">Department</span><span class="info-value">${user.department || '—'}</span></div>
+                        <div class="info-row"><span class="info-label">Target Exam</span><span class="info-value">${user.targetExams || '—'}</span></div>
+                        <div class="info-row"><span class="info-label">Joined</span><span class="info-value">${user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Today'}</span></div>
+                    </div>
+                </div>
+
+                <div class="profile-section">
+                    <div class="section-title">Performance Summary</div>
+                    <div class="glass-card">
+                        <div class="info-row"><span class="info-label">Learning Speed</span><span class="info-value">${features.avgResponseTime || 0}s avg</span></div>
+                        <div class="info-row"><span class="info-label">Consistency</span><span class="info-value">${features.consistencyScore || 0}%</span></div>
+                        <div class="info-row"><span class="info-label">Total Sessions</span><span class="info-value">${eng.sessionsPerWeek || 0}/week</span></div>
+                        <div class="info-row"><span class="info-label">Improvement</span><span class="info-value">${features.improvementSlope > 0 ? '📈 Improving' : features.improvementSlope < 0 ? '📉 Declining' : '➡️ Stable'}</span></div>
+                    </div>
+                </div>
+
+                <div class="profile-section">
+                    <button class="logout-btn" id="logout-btn">Log Out</button>
+                </div>
+            `;
+
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                BrainFeedAPI.logout();
+                window.location.href = 'LoginPG.html';
+            });
+        }
+
+        loadProfile();
+    </script>
+</body>
+
+</html>
